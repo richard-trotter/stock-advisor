@@ -1,0 +1,3 @@
+id: "20200527145235.53809000"
+project-name: stock-advisor
+stack: docker.io/appsody/java-spring-boot2:0.3
