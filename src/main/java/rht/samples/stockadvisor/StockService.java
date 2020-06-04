@@ -2,7 +2,6 @@ package rht.samples.stockadvisor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cloudant.client.api.query.EmptyExpression;
+import com.cloudant.client.api.query.QueryBuilder;
+import com.cloudant.client.api.query.QueryResult;
 import com.cloudant.client.org.lightcouch.NoDocumentException;
 
 import rht.samples.stockadvisor.models.CompanyStockDatum;
@@ -46,14 +48,20 @@ public class StockService {
   
 
   /**
-   * Retrieve the list of all companies
-   * 
-   * TODO: implement efficient means of getting known CompanyStockDatum companyNames
+   * Retrieve the list of all companies for which stock data has been retrieved.
    */
   @GetMapping("/companies")
   @ResponseBody
-  Map<String,String> getCompanyList() {
-    return companyIndex.getTickerMap();
+  List<CompanyStockDatum> getCompanyIndex() {
+    
+    String query = new QueryBuilder(EmptyExpression.empty())
+            .fields("ticker", "name")
+            .build();
+    
+    QueryResult<CompanyStockDatum> result = cloudantProxy.getDatabase()
+            .query(query, CompanyStockDatum.class);
+    
+    return result.getDocs();
   }
 
   /**

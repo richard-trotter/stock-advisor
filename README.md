@@ -69,8 +69,8 @@ Example JSON response payload:
 }
 ```
 
-Before this data is available from the API, the `/companies/add` endpoint must be invoked to retrieve the data f
-rom Alphavantage and Watson Discovery, and add the data to the Cloudant database. 
+Before this data is available from the API, the `/companies/add` endpoint must be invoked to retrieve the data 
+from Alphavantage and Watson Discovery, and add the data to the Cloudant database. 
 
 Example invocation:
 
@@ -139,4 +139,9 @@ Note the port mapping, and verify access.
 % curl http://localhost:32055/actuator/health
 {"status":{"code":"UP","description":""},"details":{}}%                          
 ```
+
+## References
+
+- [Develop a Spring microservice for Kubernetes](https://developer.ibm.com/tutorials/spring-boot-to-cloud-native-with-appsody-and-spring-cloud-kubernetes/)
+- [appsody4springsvc2k8s](https://github.com/richard-trotter/appsody4springsvc2k8s)
 

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -40,7 +41,14 @@ public class AlphavantageProxy {
 
     logger.info("alphavantage query: " + url);
 
-    ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);
+    ResponseEntity<String> entity = null;
+    try {
+      entity = restTemplate.getForEntity(url, String.class);
+    }
+    catch(HttpServerErrorException ex) {
+      logger.severe("alphavantage query faild. "+ex.toString());
+      throw new RestClientException(ex.getMessage());
+    }
     if (!HttpStatus.OK.equals(entity.getStatusCode())) {
       throw new RestClientException(entity.getStatusCode().toString());
     }

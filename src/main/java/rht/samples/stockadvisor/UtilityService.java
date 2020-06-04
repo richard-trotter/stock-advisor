@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,6 +29,9 @@ public class UtilityService {
   @Autowired
   DiscoveryProxy discoveryProxy;
   
+  @Autowired 
+  CompanyIndex companyIndex;
+  
 
   @GetMapping("/alphav/daily/{ticker}")
   @ResponseBody
@@ -46,6 +50,19 @@ public class UtilityService {
   @ResponseBody
   List<String> getCloudantDbs() {
     return cloudantProxy.getDbList();
+  }
+
+  @PostMapping("/db/delete")
+  void dropDatabase() {
+    
+      cloudantProxy.dropDatabase();
+  }
+
+  @GetMapping("/index")
+  @ResponseBody
+  Map<String,String> getCompanyIndex() {
+    return companyIndex.getTickerMap();
+
   }
 
 }

@@ -52,15 +52,20 @@ public class CloudantProxy {
     return getClient().getAllDbs();
   }
   
+  public void dropDatabase() {
+    
+    getClient().deleteDB(dbName);
+    
+    db = null;
+  }
+  
   public Database getDatabase() {
     
     if( db != null )
       return db;
     
-    // TODO: better db init
-    getClient().deleteDB(dbName);
-    
     db = getClient().database(dbName, true /*create*/);
+
     return db;
   }
 
