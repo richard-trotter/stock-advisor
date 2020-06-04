@@ -28,7 +28,6 @@ public class CompanyIndex {
           .forEach(s -> addToIndices(s));
       }
       catch (IOException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
         return;
       }
@@ -43,6 +42,10 @@ public class CompanyIndex {
   
   public String getTicker(String name) {
     return nameIndex.get(name);
+  }
+  
+  public Map<String,String> getTickerMap() {
+    return tickerIndex;
   }
   
   private void addToIndices(String s) {

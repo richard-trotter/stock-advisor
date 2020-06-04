@@ -1,0 +1,67 @@
+apiVersion: appsody.dev/v1beta1
+kind: AppsodyApplication
+metadata:
+  annotations:
+    commit.image.appsody.dev/date: Mon Jun 1 20:34:38 2020 -0400
+    commit.image.appsody.dev/message: first functional checkpoint
+    commit.stack.appsody.dev/author: Harish Yayi <yharish991@gmail.com>
+    commit.stack.appsody.dev/committer: GitHub <noreply@github.com>
+    commit.stack.appsody.dev/contextDir: /incubator/java-spring-boot2
+    commit.stack.appsody.dev/date: Wed Apr 15 16:05:23 2020 +0100
+    commit.stack.appsody.dev/message: ' java-spring-boot2: add kafka template (#742)'
+    image.opencontainers.org/created: "2020-06-03T16:53:40-04:00"
+    image.opencontainers.org/documentation: https://github.com/richard-trotter/stock-advisor
+    image.opencontainers.org/revision: 007f86518f56499928184d31a59557d793844432-modified
+    image.opencontainers.org/source: https://github.com/richard-trotter/stock-advisor/tree/master
+    image.opencontainers.org/url: https://github.com/richard-trotter/stock-advisor
+    stack.appsody.dev/authors: Erin Schnabel <schnabel@us.ibm.com>, Ozzy Osborne <ozzy@ca.ibm.com>,
+      Richard Trotter <rtrotter@us.ibm.com>, Harish Yayi <hyayi@us.ibm.com>
+    stack.appsody.dev/configured: docker.io/appsody/java-spring-boot2:0.3
+    stack.appsody.dev/created: "2020-04-15T15:38:49Z"
+    stack.appsody.dev/description: Spring Boot using OpenJ9 and Maven
+    stack.appsody.dev/digest: sha256:90d9fd9f91f4a02dc7abf58eddbfb02ce8967398b0803155ba85f508dfc60410
+    stack.appsody.dev/documentation: https://github.com/appsody/stacks/tree/master/incubator/java-spring-boot2/README.md
+    stack.appsody.dev/licenses: Apache-2.0
+    stack.appsody.dev/revision: 516d028cc6fe99e26c0ad0f3f49aca36e8949594
+    stack.appsody.dev/source: https://github.com/appsody/stacks/tree/master/incubator/java-spring-boot2/image
+    stack.appsody.dev/tag: docker.io/appsody/java-spring-boot2:0.3.29
+    stack.appsody.dev/title: Spring Boot®
+    stack.appsody.dev/url: https://github.com/appsody/stacks/tree/master/incubator/java-spring-boot2
+  creationTimestamp: null
+  labels:
+    image.opencontainers.org/title: stock-advisor
+    stack.appsody.dev/id: java-spring-boot2
+    stack.appsody.dev/version: 0.3.29
+  name: stock-advisor
+spec:
+  applicationImage: dev.local/stock-advisor
+  createKnativeService: false
+  expose: true
+  livenessProbe:
+    failureThreshold: 12
+    httpGet:
+      path: /actuator/liveness
+      port: 8080
+    initialDelaySeconds: 5
+    periodSeconds: 2
+  monitoring:
+    endpoints:
+    - path: /actuator/prometheus
+    labels:
+      k8s-app: stock-advisor
+  readinessProbe:
+    failureThreshold: 12
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 5
+    periodSeconds: 2
+    timeoutSeconds: 1
+  service:
+    annotations:
+      prometheus.io/path: /actuator/prometheus
+      prometheus.io/scrape: "true"
+    port: 8080
+    type: NodePort
+  stack: java-spring-boot2
+  version: 1.0.0

@@ -1,16 +1,4 @@
   /**
-   * Retrieve the stock data
-   */
-  GET /api/stocks
-    stockService.getStocks()
-
-  /**
-   * Retrieve the stock data for company by name
-   */
-  GET /api/stocks
-    servicesStockService.getStockByCompanyName(companyName)
-
-  /**
    * Add a company
    */
   POST /api/companies/add
@@ -31,10 +19,10 @@
 
 
   /**
-   * Add a company
+   * Retrieve the stock data
    */
-  POST /api/companies/add
-    stockService.addCompany(companyName)
+  GET /api/stocks
+    stockService.getStocks()
 
   /**
    * Retrieve the stock data for company by name
@@ -42,13 +30,4 @@
   GET /api/stocks
     servicesStockService.getStockByCompanyName(companyName)
 
-
-
-
-  /**
-   * Retrieve new data for the given companies
-   * @param {string[]} companies
-   * @returns {promise}
-   */
-  run(companies) {
 

@@ -1,20 +1,31 @@
-Watson Stock Advisor backend server
+# Watson Stock Advisor backend server
 
-see: https://github.com/IBM/watson-stock-advisor/blob/master/README.md
+## Overview 
 
 This is a Spring Boot implementation of the subject "backend server". 
 
-To retrieve company stock price and news data and add to the Cloudant database:
+See: 
+
+- IBM Code Pattern: [Create an app to get stock information, prices, and sentiment](https://developer.ibm.com/patterns/create-a-web-app-to-get-stock-information-prices-and-sentiment/?cm_sp=Developer-_-code-_-stock_information)  
+- Node.js source: [Watson Stock Advisor](https://github.com/IBM/watson-stock-advisor/blob/master/README.md)
+
+The backend server mediates interactions with 3 external services: [Alphavantage](https://www.alphavantage.co), 
+[Cloudant](https://cloud.ibm.com/docs/Cloudant?topic=Cloudant-about), and 
+[Watson Discovery Service](https://www.ibm.com/cloud/watson-discovery/resources). 
+Service URLs and credentials are specified in `application.properties`. 
+
+To facilitate deployment to Kubernetes, the backend server is implemented as an [Appsody](https://appsody.dev) application. 
+
+## API
+
+There is a single principle REST endpoint - `/api/stocks` - to retrieve the stock price history and news article references for a company by company name. 
+
+Example invocation:
 
 ``` bash
-curl -w "\nSTATUS: %{http_code}\n" -X POST 'http://localhost:8080/advisor/company?companyName=International+Business+Machines'
+curl -s 'http://localhost:8080/api/stockInfo?companyName=International+Business+Machines'
 ```
-To retrieve company data from the Cloudant database:
-
-``` bash
-curl -s 'http://localhost:8080/advisor/stockInfo?companyName=International+Business+Machines'
-```
-Example JSON payload:
+Example JSON response payload:
 
 ``` bash
 {
@@ -32,18 +43,6 @@ Example JSON payload:
             "source": "(no title)",
             "title": "IBM Stock News - Technical Buy The Dip Bullish Momentum Trade and Trigger With Options",
             "url": "https://www.cmlviz.com/research.php?number=16315&cml_article_id=20191104_ibm-stock-news--technical-buy-the-dip-bullish-momentum-trade-and-trigger-with-options"
-        },
-        {
-            "categories": [
-                "investing",
-                "beginning investing",
-                "computer reviews"
-            ],
-            "date": "2020-06-01T15:55:01Z",
-            "sentiment": "positive",
-            "source": "Banking",
-            "title": "IBM (NYSE:IBM) Earns Daily News Impact Rating of 0.22",
-            "url": "https://www.tickerreport.com/banking-finance/5679355/ibm-nyseibm-earns-daily-news-impact-rating-of-0-22.html"
         }
     ],
     "priceHistory": {
@@ -64,18 +63,80 @@ Example JSON payload:
                 "6. volume": "4345952",
                 "7. dividend amount": "0.0000",
                 "8. split coefficient": "1.0000"
-            },
-            "2020-01-09": {
-                "1. open": "135.7400",
-                "2. high": "136.7900",
-                "3. low": "135.3100",
-                "4. close": "136.7400",
-                "5. adjusted close": "133.5159",
-                "6. volume": "3730549",
-                "7. dividend amount": "0.0000",
-                "8. split coefficient": "1.0000"
             }
         }
     }
 }
 ```
+
+Before this data is available from the API, the `/companies/add` endpoint must be invoked to retrieve the data f
+rom Alphavantage and Watson Discovery, and add the data to the Cloudant database. 
+
+Example invocation:
+
+``` bash
+curl -w "\nSTATUS: %{http_code}\n" -X POST 'http://localhost:8080/api/companies/add?companyName=International+Business+Machines'
+```
+
+A listing of known company names, suitable for use with `/companies/add` is available via the `/companies` endpoint.
+
+## Kubernetes 
+
+### Prerequsites
+
+- [Docker Desktop Kubernetes](https://docs.docker.com/docker-for-mac/kubernetes/)
+- [Kubernetes CLI](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [Appsody CLI](https://appsody.dev/docs/installing/installing-appsody/)
+
+The backend server (BE) can be deployed to Kubernetes using the Appsody CLI. 
+The Appsody CLI was indeed used to kickstart this BE Spring Boot implementation.
+
+``` bash
+appsody init incubator/java-spring-boot2
+```
+
+This `init` produced a Maven POM specifying the parent POM as the following.
+
+``` bash
+  <parent>
+    <groupId>dev.appsody</groupId>
+    <artifactId>spring-boot2-stack</artifactId>
+    <version>[0.3, 0.4)</version>
+  </parent>
+```
+
+That parent POM specifies a Spring Boot version, and includes the dependency `org.springframework.boot:spring-boot-starter-actuator`.
+
+The `init` also produced some source code for a functional, though minimal, Spring Boot application. In particular, there exists an 
+`application.properties` configuration file with the following
+[Spring Boot Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html) configuration.
+
+``` bash
+management.endpoints.web.exposure.include=health,metrics,prometheus,liveness
+```
+
+The `appsody deploy` command generates a Kubernetes resource of "kind" `AppsodyApplication`, and includes specifications for a `readinessProbe` and `livenessProbe`. 
+These specifications indicate to Kubernetes a set of REST endpoints supported by the AppsodyApplication that Kubernetes will use to determine "readiness" (ready to receive client requests) and "liveness" (still able to respond to client requests). The generated configuration specifies that the Spring Boot Actuator `/health` and `/liveness` endpoints be used as Kubernetes "readiness" and "liveness" probes.
+
+To deploy to Docker Desktop Kubernetes, ensure that the Kubernetes CLI is configured as shown below.
+
+``` bash
+kubectl config use-context docker-desktop
+```
+
+Then simply run `appsody deploy`. This will run a Maven `package`, build a Docker image, push the image to the Docker registry, and `apply` the AppsodyApplication Kubernetes resource. The deployed BE server will then be accessible via a Kubernetes "NodePort service".
+
+Example: 
+
+```bash
+% kubectl get svc stock-advisor                
+NAME            TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+stock-advisor   NodePort   10.103.15.95   <none>        8080:32055/TCP   4m24s
+```
+Note the port mapping, and verify access. 
+
+``` bash
+% curl http://localhost:32055/actuator/health
+{"status":{"code":"UP","description":""},"details":{}}%                          
+```
+

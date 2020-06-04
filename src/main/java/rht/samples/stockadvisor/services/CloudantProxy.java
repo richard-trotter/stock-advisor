@@ -1,4 +1,4 @@
-package rht.samples.stockadvisor;
+package rht.samples.stockadvisor.services;
 
 import java.net.MalformedURLException;
 import java.net.URL;

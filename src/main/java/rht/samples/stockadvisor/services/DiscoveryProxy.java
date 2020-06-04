@@ -1,7 +1,8 @@
-package rht.samples.stockadvisor;
+package rht.samples.stockadvisor.services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import com.ibm.watson.discovery.v1.model.QueryResult;
 
 @Configuration
 public class DiscoveryProxy {
+
+  private static Logger logger = Logger.getLogger(DiscoveryProxy.class.getName());
 
   @Autowired
   Discovery discoveryService;
@@ -51,7 +54,7 @@ public class DiscoveryProxy {
     Response<QueryResponse> response = serviceCall.execute();
     List<QueryResult> queryResults = response.getResult().getResults();
 
-    System.out.println("\nResult count: " + queryResults.size());
+    logger.info("query result count: " + queryResults.size());
 
     return queryResults.stream().map(q -> q.getProperties()).collect(Collectors.toList());
   }

@@ -1,6 +1,8 @@
 package rht.samples.stockadvisor.models;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ArticleReference {
 
@@ -46,6 +48,35 @@ public class ArticleReference {
   }
   public void setCategories(List<String> categories) {
     this.categories = categories;
+  }
+
+  private static String parseCategory(Map<String, Object> category) {
+    
+    String[] parts = ((String)category.get("label")).split("/");
+    return parts[parts.length-1];
+  }
+
+  public static ArticleReference fromQueryResultProperties(Map<String, Object> properties) {
+  
+    ArticleReference articleReference = new ArticleReference();
+  
+    articleReference.setUrl(properties.get("url").toString());
+    articleReference.setDate(properties.get("crawl_date").toString());
+    articleReference.setTitle(properties.get("title").toString());
+    articleReference.setSource(properties.get("forum_title").toString());
+  
+    Map<String, Object> enrichedText = (Map<String, Object>) properties.get("enriched_text");
+    Map<String, Object> sentiment = (Map<String, Object>) enrichedText.get("sentiment");
+    Map<String, Object> document = (Map<String, Object>) sentiment.get("document");
+  
+    articleReference.setSentiment(document.get("label").toString());
+  
+    List<Map<String, Object>> cats = (List<Map<String, Object>>) enrichedText.get("categories");
+    List<String> shortLabels = cats.stream()
+            .map(x -> parseCategory(x)).collect(Collectors.toList());
+    articleReference.setCategories(shortLabels);
+  
+    return articleReference;
   }
 
 }
