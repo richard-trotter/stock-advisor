@@ -33,7 +33,30 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
+        
+        <!-- 
+            For sensitive configuration represented as 'K8s Secrets' 
+        -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-kubernetes-config</artifactId>
+            <version>1.0.5.RELEASE</version>
+            <exclusions>
+                <!--  This version of SCK depends on OkHttp 3.9 while Discovery requires 3.12 -->
+                <exclusion> 
+                    <groupId>com.squareup.okhttp3</groupId>
+                    <artifactId>okhttp</artifactId>
+                </exclusion>
+                <exclusion> 
+                    <groupId>com.squareup.okhttp3</groupId>
+                    <artifactId>logging-interceptor</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <!-- 
+            For external service integrations
+        -->
         <dependency>
             <groupId>com.cloudant</groupId>
             <artifactId>cloudant-client</artifactId>

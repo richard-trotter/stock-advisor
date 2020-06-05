@@ -28,3 +28,6 @@
 
 ### VS Code ###
 .vscode/
+/service_config.json
+/secrets.yml
+/src/main/resources/application-test.properties

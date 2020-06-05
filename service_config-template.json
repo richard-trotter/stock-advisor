@@ -1,0 +1,11 @@
+{
+  "alphavantage.baseurl": "XXXX",
+  "alphavantage.apikey": "XXXX",
+
+  "cloudant.url": "XXXX",
+  "cloudant.apikey": "XXXX",
+  "cloudant.db_name": "XXXX",
+
+  "watson.discovery.url": "XXXX",
+  "watson.discovery.iam_apikey": "XXXX"
+}
