@@ -159,6 +159,19 @@ Created deployment manifest: app-deploy.yaml
 
 This implementation includes an `app-deploy.yaml` that has already had the needed `volumes` and `volumeMounts` configurations added. 
 
+Excerpt:
+
+``` yaml
+  volumeMounts:
+  - mountPath: /etc/secrets/watson
+    name: watson-secrets
+    readOnly: true
+  volumes:
+  - name: watson-secrets
+    secret:
+      secretName: discovery-access
+```
+
 To deploy to Docker Desktop Kubernetes, ensure that the Kubernetes CLI is configured as shown below.
 
 ``` bash
